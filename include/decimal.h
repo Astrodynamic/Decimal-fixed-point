@@ -1,48 +1,11 @@
-# Decimal
+#pragma once
 
-Decimal is a high-precision arithmetic library for financial calculations. Mimics the behavior of Postgresql's decimal type.
+#include <bitset>
+#include <cstddef>
+#include <optional>
+#include <regex>
+#include <string_view>
 
-## Dependencies
-
-- **C++17** compliant compiler
-- **CMake** (>= 3.28.3)
-- **GoogleTest** (for running tests)
-
-## Build
-
-```sh
-# build
-cmake -S . -B build
-cmake --build build
-
-# run tests
-./build/tests/TEST
-```
-
-## Usage
-
-```cpp
-#include <iostream>
-#include "decimal.h"
-
-int main() {
-    using utils::finantial::Decimal;
-
-    Decimal a{"123.456"};
-    Decimal b{"78.9"};
-
-    std::cout << "add: " << a + b << '\n';
-    std::cout << "sub: " << a - b << '\n';
-    std::cout << "mul: " << a * b << '\n';
-    std::cout << "div: " << a / b << '\n';
-    std::cout << "mod: " << a % b << '\n';
-    return 0;
-}
-```
-
-## Interface
-
-```cpp
 namespace utils::finantial {
 template <std::size_t I = 24, std::size_t F = 8> class Decimal final {
 public:
@@ -79,14 +42,20 @@ public:
   friend auto operator<<(std::ostream& os, Decimal<_I, _F> decimal) -> std::ostream&;
 
   explicit operator std::string() const noexcept;
+
+private:
+  static inline const std::regex m_mask{"^([+-]?)(?:0*)(\\d{0," + std::to_string(I) + "})(?:\\.(\\d{0," + std::to_string(F) + "})(?:\\d*))?$"};
+
+  static constexpr std::size_t m_bits = (I + F) * 3.3219280948873623478703194294894 + 3;
+  static constexpr std::bitset<m_bits> m_bit_ten{0b1010};
+
+  std::bitset<m_bits> m_mantissa{};
+
+  [[nodiscard]] auto parse(const std::string_view& value) const -> std::optional<std::cmatch>;
+  [[nodiscard]] auto sign() const noexcept -> bool;
+  auto conversion(const std::cmatch& match) -> void;
+  auto abs() noexcept -> Decimal&;
 };
 } // namespace utils::finantial
-```
 
-## Improving Algorithms  
-
-The library currently uses basic algorithms for computations. If you have experience with more efficient methods, especially those utilizing bitwise operations, you are welcome to contribute your improvements. This will not only enhance the library's performance but also help the author gain knowledge of these techniques.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+#include "decimal.tpp"
