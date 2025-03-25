@@ -51,10 +51,12 @@ public:
   Decimal(Decimal&&) noexcept = default;
   ~Decimal() = default;
 
+  // Assignment
   auto operator=(const std::string_view& value) -> Decimal&;
   auto operator=(const Decimal&) noexcept -> Decimal& = default;
   auto operator=(Decimal&&) noexcept -> Decimal& = default;
 
+  // Comparison operators
   [[nodiscard]] auto operator<(const Decimal& other) const noexcept -> bool;
   [[nodiscard]] auto operator>(const Decimal& other) const noexcept -> bool;
   [[nodiscard]] auto operator>=(const Decimal& other) const noexcept -> bool;
@@ -62,6 +64,7 @@ public:
   [[nodiscard]] auto operator==(const Decimal& other) const noexcept -> bool;
   [[nodiscard]] auto operator!=(const Decimal& other) const noexcept -> bool;
 
+  // Arithmetic operators
   [[nodiscard]] auto operator-() const noexcept -> Decimal;
   [[nodiscard]] auto operator+(const Decimal& other) const noexcept -> Decimal;
   [[nodiscard]] auto operator-(const Decimal& other) const noexcept -> Decimal;
@@ -75,9 +78,11 @@ public:
   auto operator/=(const Decimal& other) noexcept -> Decimal&;
   auto operator%=(const Decimal& other) noexcept -> Decimal&;
 
+  // Stream output
   template <std::size_t _I, std::size_t _F>
   friend auto operator<<(std::ostream& os, Decimal<_I, _F> decimal) -> std::ostream&;
 
+  // Conversion to string
   explicit operator std::string() const noexcept;
 };
 } // namespace utils::finantial
